@@ -1,0 +1,44 @@
+.text, .text5 {
+    -fx-font-size: 20px;
+    -fx-stroke: white;
+    -fx-stroke-width: 2px;
+    -fx-font-family: "Arial";
+}
+
+.text2, .text5 {
+    -fx-font-size: 45px;
+    -fx-stroke: rgb(120, 48, 3);
+    -fx-fill: rgb(120, 48, 3);
+    -fx-stroke-width: 5px;
+    -fx-font-family: "Arial";
+}
+
+.text3, .text4 {
+    -fx-font-size: 60px;
+    -fx-stroke: white;
+    -fx-fill: white;
+    -fx-stroke-width: 5px;
+    -fx-font-family: "Arial";
+}
+
+.text4, .text5 {
+    -fx-stroke: rgb(120, 48, 3);
+    -fx-fill: rgb(120, 48, 3);
+}
+
+.text5 {
+    -fx-font-size: 35px;
+    -fx-stroke-width: 3px;
+}
+
+/* Hover Styles */
+
+.text2.hovered, .text3.hovered, .text4.hovered, .text5.hovered {
+    -fx-stroke: white;
+    -fx-fill: white;
+}
+
+.text.hovered, .text3.hovered {
+    -fx-stroke: rgb(120, 48, 3);
+    -fx-fill: rgb(120, 48, 3);
+}
