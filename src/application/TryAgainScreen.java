@@ -10,13 +10,13 @@ public class TryAgainScreen extends Game{
 	private Text tryAgain;
 	private Game g;
 
-	public TryAgainScreen(int w, int h, String pozadie, boolean executeAll, Group root, Game g) {
-		super(w, h, pozadie, executeAll, root);
+	public TryAgainScreen(double w, double h, String background, boolean executeAll, Group root, Game g) {
+		super(w, h, background, executeAll, root);
 		this.g = g;
 		
-		end_score = new Text(15, 470, "YOUR SCORE: "); end_score.getStyleClass().add("text");
-        tryAgain = new Text(360, 200, "TRY AGAIN"); tryAgain.getStyleClass().add("text3");
-        exit = new Text(850, 470, "EXIT THE GAME"); exit.getStyleClass().add("text");
+		end_score = new Text(w/30, (h/15)*14, "YOUR SCORE: "); end_score.getStyleClass().add("text");
+        tryAgain = new Text(w/2.85, h/2.25, "TRY AGAIN"); tryAgain.getStyleClass().add("text3");
+        exit = new Text((w/30)*24.5, (h/15)*14, "EXIT THE GAME"); exit.getStyleClass().add("text");
         
         tryAgain.setOnMousePressed(e -> reset());
         tryAgain.setOnMouseEntered(e -> tryAgain.getStyleClass().add("hovered"));

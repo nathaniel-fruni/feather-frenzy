@@ -23,50 +23,51 @@ import javafx.util.Duration;
 
 public class Game extends Group {
 	
-    final int MAXBIRD = 10; // maximalny pocet vtakov na scene
+    final int MAXBIRD = 10; // max number of birds on scene
     private int SCORE = 0;
-    private int BULLETS = 10; // pocet dostupnych nabojov
-    private int[] TIME = {75}; // cas v hre (pouzite pole, pretoze ho posuvam do funkcii, int by nefungoval pretoze by sa vytvarala len jeho kopia)
-    private double maxWidth, maxHeight; // rozmer plochy hry
-    private LinkedList<Bird> birdList; // zoznam vtakov na scene
-    private LinkedList<ImageView> bulletList; // zoznam nabojov (obrazky)
+    private int BULLETS = 10; // max number of bullets
+    private int[] TIME = {60}; // time in game 
+    private int BULLET_SIZE = 50;
+    private double maxWidth, maxHeight; // game dimensions
+    private LinkedList<Bird> birdList; // birds on scene
+    private LinkedList<ImageView> bulletList; // bullets on scene
     private ImageView background;
-    // Texty
-    private Text score; // vypisovanie skore
-    private Text time; // vypisovanie casu
-    private Text pause; // text ako tlacidlo PAUSE
-    private Text SpaceReload; // informacny text ako nabit zbran po minuti nabojov
-    // Hudba a zvuky
+    // Texts
+    private Text score;
+    private Text time; 
+    private Text pause;
+    private Text SpaceReload;
+    // Music and sounds
     private MediaPlayer gunshot;
     private MediaPlayer backgroundMusic;
     private MediaPlayer gunReload;
     private MediaPlayer emptyGun;
     private MediaPlayer bird;
-    // Casovace
-    private Timeline timeline; // casovac pre odpocitavanie casu v hre
-    private AnimationTimer timer; // casovac aktualizovania sceny hry
-    // Root, Scene a obrazovky
+    // Timers
+    private Timeline timeline; // for in game time
+    private AnimationTimer timer; // for game updating
+    // Root, Scene and screens
     protected Group root;
     private TryAgainScreen tryAgainScreen;
     private PauseScreen pauseScreen;
         
-    public Game(int w, int h, String pozadie, boolean executeAll, Group root) {
-    	// prikazy pre hru a aj pre jej subclassy
+    public Game(double w, double h, String bgd, boolean executeAll, Group root) {
+    	// for Game class and its subclasses
     	maxWidth = w; maxHeight = h; this.root = root;
-        Image bg = new Image(pozadie, w, h, false, false);
+        Image bg = new Image(bgd, w, h, false, false);
         background = new ImageView(bg);
         getChildren().add(background);
-        // fokus pre to, aby sa pomocou stlacenia SPACE dalo dobijat
+        // to be able to reload using space key
         setFocusTraversable(true);
         requestFocus();      
         
-        // prikazy len pre hru
+        // only for Game class
         if(executeAll) {
-        	//Texty
-        	time = new Text(450, 30, "TIME: " + formatTime(TIME[0])); time.getStyleClass().add("text");
-        	score = new Text(13, 30, "SCORE: " + SCORE); score.getStyleClass().add("text");
-	        pause = new Text(940,30, "PAUSE"); pause.getStyleClass().add("text");
-	        SpaceReload = new Text(400, 450, "PRESS SPACE TO RELOAD"); SpaceReload.getStyleClass().add("text");
+        	// Texts
+        	time = new Text(maxWidth/2.25, maxHeight/20, "TIME: " + formatTime(TIME[0])); time.getStyleClass().add("text");
+        	score = new Text(maxWidth/30, maxHeight/20, "SCORE: " + SCORE); score.getStyleClass().add("text");
+	        pause = new Text((maxWidth/30)*27, maxHeight/20, "PAUSE"); pause.getStyleClass().add("text");
+	        SpaceReload = new Text(maxWidth/2.5, (maxHeight/8)*7, "PRESS SPACE TO RELOAD"); SpaceReload.getStyleClass().add("text");
 	        
 	        pause.setOnMousePressed(e -> pauseClick());
 	        pause.setOnMouseEntered(e -> pause.getStyleClass().add("hovered"));
@@ -74,18 +75,18 @@ public class Game extends Group {
 	        
             getChildren().addAll(time, score, pause);
             
-            //Pause obrazovka a Try Again obrazovka
-            pauseScreen = new PauseScreen(1024, 500, "file:resources/screens/pause_screen.png", false, root, this);
-            tryAgainScreen = new TryAgainScreen(1024, 500, "file:resources/screens/try_again_screen.png", false, root, this);
+            // Pause screen a Try Again screen
+            pauseScreen = new PauseScreen(w, h, "file:resources/screens/pause_screen.png", false, root, this);
+            tryAgainScreen = new TryAgainScreen(w, h, "file:resources/screens/try_again_screen.png", false, root, this);
 	        
-            // Casovac pre odpocitavanie casu v hre
+            // timer for in game play time 
 	        timeline = new Timeline();
 	        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
 	            @Override
 	            public void handle(ActionEvent event) {
 	                TIME[0]--;
 	                time.setText("TIME: " + formatTime(TIME[0]));
-	                // ak vyprsi cas, zastavia sa oba casovace hry a na scenu sa prida Try Again Screen a nastavi sa do nej nahrate skore
+	                // if time runs out, both timers stop, Try Again screen is added to scene and score is set
 	                if (TIME[0] <= 0) {
 	                    timeline.stop();
 	                    timer.stop();
@@ -97,19 +98,19 @@ public class Game extends Group {
 	        timeline.getKeyFrames().add(keyFrame);
 	        timeline.setCycleCount(Timeline.INDEFINITE);
 	        
-	        // Casovac aktualizovania sceny hry
+	        // timer for game updating
 	        timer = new Timer(this);
 
-	        // Inicializácia List-ov a vytvorenie nábojov
+	        // list inicialization and bullet display
             birdList = new LinkedList<>();
             bulletList = new LinkedList<>();
             CreateBullets();
             
-            // Hudba a zvuky
+            // Music and sounds
             Media backgroundSound = new Media(new File("resources/sound/background_music.mp3").toURI().toString());
             backgroundMusic = new MediaPlayer(backgroundSound);
-            backgroundMusic.setAutoPlay(true); // aby sa spustila automaticky pri zapnuti aplikacie
-            backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); // aby hrala stale
+            backgroundMusic.setAutoPlay(true);
+            backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); 
             
             Media gunshotSound = new Media(new File("resources/sound/gunshot.mp3").toURI().toString());
             gunshot = new MediaPlayer(gunshotSound);
@@ -129,33 +130,33 @@ public class Game extends Group {
     }
     
     public void startGame() {
-    	// metoda, ktoru sa vola po kliknuti na START THE GAME na Start Screen
+    	// method that is called in StartScreen after clicking on START THE GAME button
     	timer.start();
  	    timeline.play();
     }
     
     private void pauseClick() {
-    	// metoda, ktora sa vola po kliknuti na PAUSE
+    	// method that is called after clicking on PAUSE button
     	timeline.stop();
         timer.stop();
         root.getChildren().add(pauseScreen);
     }
     
     public void resumeGame() {
-    	// metoda, ktora sa vola po kliknuti na RESUME na Pause Screen
+    	// method that is called in PauseScreen after clicking on RESUME button
     	timer.start();
     	timeline.play();
     }
     
     public void resetGame() {
-    	// metoda, ktora sa vola po kliknuti na TRY AGAIN na Try Again Screen
+    	// method that is called in TryAgainScreen after clicking on TRY AGAIN button
     	SCORE = 0;
-    	TIME[0] = 75;
+    	TIME[0] = 60;
    	    score.setText("SCORE: " + SCORE);
    	    time.setText("TIME: " + formatTime(TIME[0]));
   	    if (getChildren().contains(SpaceReload)) getChildren().remove(SpaceReload);
   	   
-  	    // vymazanie vtakov, ktory zostali na scene
+  	    // delete birds that remained on scene
   	    Iterator<Bird> iterator = birdList.iterator();
   	    while (iterator.hasNext()) {
   	    	Bird element = iterator.next();
@@ -163,7 +164,7 @@ public class Game extends Group {
 		    getChildren().remove(element);
 	    }
   	    
-  	    // vymazanie nabojov, ktore zostali a obnovenie do stavu 10
+  	    // delete remaining bullets and reload
      	Iterator<ImageView> iteratorBullets = bulletList.iterator();
   	    while (iteratorBullets.hasNext()) {
   	    	ImageView element = iteratorBullets.next();
@@ -173,26 +174,29 @@ public class Game extends Group {
   	    BULLETS = 10;
   	    CreateBullets();
   	   
-  	    // spustenie casovacov
+  	    // start the timers
   	    startGame(); 
      }
     
     public void updateGame(double deltaTime) {
-    	CreateBird(); // vytvaranie vtakov
-        MoveBird(deltaTime/1000000000); // pohyb vtakov
-        DeleteBirds(); // premazanie vakov
-        // vypisanie informacneho textu o nabijani
+    	CreateBird();
+        MoveBird(deltaTime/1000000000);
+        DeleteBirds(); // delete off screen birds
+        // space reload info text
         if (BULLETS == 0 && (!getChildren().contains(SpaceReload))) {
         	getChildren().add(SpaceReload);
         } 
     }
     
     private void CreateBullets() {
-    	Image img = new Image("file:resources/other/bullet.png", 50, 50, false, false);
-    	// zobrazenie 10 nabojov za sebou
-    	for (int i = 965; i >= 515; i-= 50) {
+    	Image img = new Image("file:resources/other/bullet.png", BULLET_SIZE, BULLET_SIZE, false, false);
+    	
+    	int initialX = (int) maxWidth - BULLET_SIZE;
+    	
+    	// display 10 bullets in a row
+    	for (int i = initialX; i >= initialX - (9 * BULLET_SIZE); i-= BULLET_SIZE) {
     		ImageView blt = new ImageView(); blt.setImage(img);
-    		blt.setLayoutX(i); blt.setLayoutY(440);
+    		blt.setLayoutX(i); blt.setLayoutY((this.maxHeight/8)*7);
         	bulletList.add(blt);
         	getChildren().add(blt);
     	}
@@ -201,10 +205,10 @@ public class Game extends Group {
     private void CreateBird() {
     	if (birdList.size() < MAXBIRD) {
     		if (Math.random() < 0.3) {
-    			int[] values = {50, 70, 105}; // velkosti vtakov 
-    			// vygenerovanie nahodnej velkosti
+    			double[] birdSizes = {this.maxWidth/20, this.maxWidth/15, this.maxWidth/10}; 
+    			// generate random bird size
     	        int randomIndex = new Random().nextInt(3);
-    	        int randomSize = values[randomIndex]; 
+    	        double randomSize = birdSizes[randomIndex]; 
     	        Bird b = new Bird("file:resources/birds/bird", 48,randomSize, randomSize, maxWidth, maxHeight);
     	        birdList.add(b);                
     	        getChildren().add(b);          
@@ -213,7 +217,6 @@ public class Game extends Group {
     }
     
     private void MoveBird(double delta) {
-    	// pohnutie kazdeho vtaka v liste
     	Iterator<Bird> iterator = birdList.iterator();
     	while (iterator.hasNext()) {
     		Bird element = iterator.next();
@@ -222,46 +225,46 @@ public class Game extends Group {
     }
     
     private void DeleteBirds() {
-    	// vymazanie vtakov ak su v stave 2, teda presli za okraj sceny
+    	// delete all birds that are off screen
     	Iterator<Bird> iterator = birdList.iterator();
     	while (iterator.hasNext()) {
     		Bird element = iterator.next();
     		if (element.getState() == 2) {
-    			iterator.remove(); // zo zoznamu
-    			getChildren().remove(element); // zo sceny
+    			iterator.remove();
+    			getChildren().remove(element); 
     		} 
     	}
     }
     
    private void onClick(MouseEvent evt) {
-	   // pozicia, kam sa kliklo
+	   // clicked position
 	   double mouseX = evt.getX();
 	   double mouseY = evt.getY();
 	   
-	   // Vtaky ak sa na nich kliklo
-	   if(BULLETS > 0) { // overenie ci pri kliknuti bola nabita zbran
-		   // prechod po zozname vtakov a identifikovanie, ci sa na neho kliklo
+	   // birds, if clicked on
+	   if(BULLETS > 0) { // if the gun was loaded
+		   // iterate over all birds and check if the bird was clicked on
 		   Iterator<Bird> iterator = birdList.iterator();
 		   while (iterator.hasNext()) {
 			   Bird element = iterator.next();
 			   
 			   if (element.getBoundsInParent().contains(mouseX, mouseY)) {
 				   
-				   // zvuk vtaka
+				   // bird sound
 	 	   		   if(element.getState() != 1) {
-	 	   			   bird.seek(Duration.ZERO); // resetuje zvuk na zaciatok
+	 	   			   bird.seek(Duration.ZERO); // reset the sound to begining
 		 	   		   bird.play();
 	 	   		   }
 				   
-				   element.setState(1); // nastavi stav na zostreleny
-				   // prideli pocet bodov na zaklade velkosti
-	 	 	       if (element.getSize() == 35) SCORE += 25;
-	 	   		   if (element.getSize() == 70) SCORE += 15;
-	 	   		   if (element.getSize() == 105) SCORE += 5;
+				   element.setState(1); // set state to dead
+				   // points based on size
+	 	 	       if (element.getSize() == this.maxWidth/20) SCORE += 25;
+	 	   		   if (element.getSize() == this.maxWidth/15) SCORE += 15;
+	 	   		   if (element.getSize() == this.maxWidth/10) SCORE += 5;
 	 	   		   score.setText("SCORE: " + SCORE);
 
-	 	 	       // odstranenie vtaka po 2 sekundach
-	 	   		   PauseTransition pause = new PauseTransition(Duration.seconds(2));
+	 	 	       // delete dead bird after 3 seconds
+	 	   		   PauseTransition pause = new PauseTransition(Duration.seconds(3));
 	 	           pause.setOnFinished(e -> {
 	 	        	   birdList.remove(element);
 	 	        	   getChildren().remove(element);
@@ -273,16 +276,16 @@ public class Game extends Group {
 	 	   }
 	   }
 	   
-	   // Naboje
-	   // prehratie zvuku vystrelu alebo prazdnej zbrane podla stavu nabojov
+	   // Bullets
+	   // play gunshot or empty gun based on bullet count
  	   if(BULLETS > 0) {
- 		   gunshot.seek(Duration.ZERO); // resetuje zvuk na zaciatok
+ 		   gunshot.seek(Duration.ZERO);
  	 	   gunshot.play();
  	   } else {
- 		   emptyGun.seek(Duration.ZERO); // resetuje zvuk na zaciatok
+ 		   emptyGun.seek(Duration.ZERO); 
 		   emptyGun.play();
  	   }
-	   // odpocitanie naboja a vymazanie naboja z listu a zo sceny
+	   // gunshot and bullet behaviour
 	   BULLETS--; 
  	   if (!bulletList.isEmpty()) {
  		   getChildren().remove(bulletList.removeLast());
@@ -293,11 +296,11 @@ public class Game extends Group {
 	   KeyCode key = e.getCode();
    	   if (key == KeyCode.SPACE) {
    		   BULLETS = 10;
-   		   gunReload .seek(Duration.ZERO); //resetuje zvuk na zaciatok
+   		   gunReload .seek(Duration.ZERO); 
    		   gunReload.play();
    	       getChildren().remove(SpaceReload);
    	   }
-   	   // vymazanie stareho Listu nabojov a opätovne naplnenie (osetrenie pre pripad nabijania, ked este nie su minute vsetky naboje)
+   	   // delete old list of bullets and fill it up again (in case of reloading not empty gun)
    	   Iterator<ImageView> iterator = bulletList.iterator();
    	   while (iterator.hasNext()) {
    		   ImageView element = iterator.next();
