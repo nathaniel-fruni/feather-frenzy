@@ -30,7 +30,7 @@ This README provides details about the project's structure and features:
 - **Pause and Resume:** Pause the game at any time and seamlessly resume your bird shooting adventure.
 - **Results and Options:** View your game results, choose to retry for a better score, or exit the game.
 
-### Music and Image credits
+## Music and Image credits
 
 The music and images used in this project are sourced from Pixabay and individual accounts on Pixabay. I would like to express my gratitude to the following contributors:
 
@@ -40,6 +40,6 @@ The music and images used in this project are sourced from Pixabay and individua
 
 Please visit their profiles on Pixabay to explore more of their work.
 
-### License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
