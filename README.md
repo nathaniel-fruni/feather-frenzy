@@ -25,10 +25,10 @@ This README provides details about the project's structure and features:
 
 ### Key Features
 
-- Timed Gameplay: Play against the clock and collect points for shooting down birds.
-- Distance Bonus: Earn more points for taking down birds at a greater distance.
-- Pause and Resume: Pause the game at any time and seamlessly resume your bird shooting adventure.
-- Results and Options: View your game results, choose to retry for a better score, or exit the game.
+- **Timed Gameplay:** Play against the clock and collect points for shooting down birds.
+- **Distance Bonus:** Earn more points for taking down birds at a greater distance.
+- **Pause and Resume:** Pause the game at any time and seamlessly resume your bird shooting adventure.
+- **Results and Options:** View your game results, choose to retry for a better score, or exit the game.
 
 ### Music and Image credits
 
