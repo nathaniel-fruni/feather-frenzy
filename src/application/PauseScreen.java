@@ -1,20 +1,38 @@
 package application;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-public class PauseScreen extends Game{
+public class PauseScreen extends StackPane{
 	
 	private Text resume;
 	private Text exit;
 	private Game game;
+	private Group root;
 
-	public PauseScreen(double w, double h, String background, boolean executeAll, Group root, Game game) {
-		super(w, h, background, executeAll, root);
+	public PauseScreen(double w, double h, String background, Group root, Game game) {
+		Image bg = new Image(background, w, h, false, false);
+        ImageView bgd = new ImageView(bg);
+        getChildren().add(bgd);
 		this.game = game;
+		this.root = root;
 		
-        resume = new Text(w/2.55, h/2.1, "RESUME"); resume.getStyleClass().add("text4");
-        exit = new Text(w/2.1, h/1.6, "EXIT"); exit.getStyleClass().add("text5");
+		initializeTexts();
+	}
+	
+	private void initializeTexts() {
+		resume = new Text("RESUME"); resume.getStyleClass().add("text4");
+        exit = new Text("EXIT"); exit.getStyleClass().add("text5");
+        
+        setAlignment(resume, Pos.CENTER);
+        setAlignment(exit, Pos.CENTER);
+        
+        setMargin(exit, new Insets(200,0,0,0));
         
         resume.setOnMousePressed(e -> onClickResume());
 		resume.setOnMouseEntered(e -> resume.getStyleClass().add("hovered"));

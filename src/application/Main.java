@@ -18,20 +18,19 @@ public class Main extends Application {
 			Screen screen = Screen.getPrimary();
 	        double screenWidth = screen.getBounds().getWidth();
 	        double screenHeight = screen.getBounds().getHeight();
-	        double gameWidth = screenWidth * 0.8;
-	        double gameHeight = screenHeight * 0.8;
 	        
-	        Scene scene = new Scene(root, gameWidth, gameHeight);
+	        Scene scene = new Scene(root, screenWidth, screenHeight);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			
 			Image cursorImage = new Image("file:resources/other/aim.png");
 			scene.setCursor(new ImageCursor(cursorImage, cursorImage.getWidth() / 2, cursorImage.getHeight() / 2));
 			
-	        Game game = new Game(gameWidth, gameHeight, "file:resources/screens/background.png", true, root);
+	        Game game = new Game(screenWidth, screenHeight, "file:resources/screens/background.png", root);
 	        
-	        StartScreen strS = new StartScreen(gameWidth, gameHeight, "file:resources/screens/start_screen.png", false, root, game);
+	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "file:resources/screens/start_screen.png", root, game);
 	        root.getChildren().add(strS);
 	        
+	        primaryStage.setFullScreen(true);
 	        primaryStage.setScene(scene); 
 	        primaryStage.setTitle("Feather Frenzy");
 	        primaryStage.show();

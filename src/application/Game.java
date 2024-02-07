@@ -1,6 +1,10 @@
 package application;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -10,12 +14,16 @@ import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Text;
@@ -25,6 +33,7 @@ public class Game extends Group {
 	
     final int MAXBIRD = 10; // max number of birds on scene
     private int SCORE = 0;
+    private int HIGH_SCORE;
     private int BULLETS = 10; // max number of bullets
     private int[] TIME = {60}; // time in game 
     private int BULLET_SIZE = 50;
@@ -36,7 +45,7 @@ public class Game extends Group {
     private Text score;
     private Text time; 
     private Text pause;
-    private Text SpaceReload;
+    private StackPane SpaceReload;
     // Music and sounds
     private MediaPlayer gunshot;
     private MediaPlayer backgroundMusic;
@@ -51,82 +60,141 @@ public class Game extends Group {
     private TryAgainScreen tryAgainScreen;
     private PauseScreen pauseScreen;
         
-    public Game(double w, double h, String bgd, boolean executeAll, Group root) {
-    	// for Game class and its subclasses
+    public Game(double w, double h, String bgd, Group root) {
     	maxWidth = w; maxHeight = h; this.root = root;
         Image bg = new Image(bgd, w, h, false, false);
         background = new ImageView(bg);
-        getChildren().add(background);
-        // to be able to reload using space key
-        setFocusTraversable(true);
-        requestFocus();      
+        getChildren().add(background);      
         
-        // only for Game class
-        if(executeAll) {
-        	// Texts
-        	time = new Text(maxWidth/2.25, maxHeight/20, "TIME: " + formatTime(TIME[0])); time.getStyleClass().add("text");
-        	score = new Text(maxWidth/30, maxHeight/20, "SCORE: " + SCORE); score.getStyleClass().add("text");
-	        pause = new Text((maxWidth/30)*27, maxHeight/20, "PAUSE"); pause.getStyleClass().add("text");
-	        SpaceReload = new Text(maxWidth/2.5, (maxHeight/8)*7, "PRESS SPACE TO RELOAD"); SpaceReload.getStyleClass().add("text");
-	        
-	        pause.setOnMousePressed(e -> pauseClick());
-	        pause.setOnMouseEntered(e -> pause.getStyleClass().add("hovered"));
-	        pause.setOnMouseExited(e -> pause.getStyleClass().remove("hovered"));
-	        
-            getChildren().addAll(time, score, pause);
-            
-            // Pause screen a Try Again screen
-            pauseScreen = new PauseScreen(w, h, "file:resources/screens/pause_screen.png", false, root, this);
-            tryAgainScreen = new TryAgainScreen(w, h, "file:resources/screens/try_again_screen.png", false, root, this);
-	        
-            // timer for in game play time 
-	        timeline = new Timeline();
-	        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
-	            @Override
-	            public void handle(ActionEvent event) {
-	                TIME[0]--;
-	                time.setText("TIME: " + formatTime(TIME[0]));
-	                // if time runs out, both timers stop, Try Again screen is added to scene and score is set
-	                if (TIME[0] <= 0) {
-	                    timeline.stop();
-	                    timer.stop();
-	                    tryAgainScreen.setScore(SCORE);
-	                    root.getChildren().add(tryAgainScreen);
-	                }
-	            }
-	        });
-	        timeline.getKeyFrames().add(keyFrame);
-	        timeline.setCycleCount(Timeline.INDEFINITE);
-	        
-	        // timer for game updating
-	        timer = new Timer(this);
+        // Displayed texts
+        initializeTexts();
+        
+        // Pause screen a Try Again screen
+        pauseScreen = new PauseScreen(w, h, "file:resources/screens/pause_screen.png", root, this);
+        tryAgainScreen = new TryAgainScreen(w, h, "file:resources/screens/try_again_screen.png", root, this);
+        
+        initializeTimers();
 
-	        // list inicialization and bullet display
-            birdList = new LinkedList<>();
-            bulletList = new LinkedList<>();
-            CreateBullets();
-            
-            // Music and sounds
-            Media backgroundSound = new Media(new File("resources/sound/background_music.mp3").toURI().toString());
-            backgroundMusic = new MediaPlayer(backgroundSound);
-            backgroundMusic.setAutoPlay(true);
-            backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); 
-            
-            Media gunshotSound = new Media(new File("resources/sound/gunshot.mp3").toURI().toString());
-            gunshot = new MediaPlayer(gunshotSound);
-            
-            Media gunReloadSound = new Media(new File("resources/sound/gun_reload.mp3").toURI().toString());
-            gunReload = new MediaPlayer(gunReloadSound);
-            
-            Media emptyGunSound = new Media(new File("resources/sound/empty_gun.mp3").toURI().toString());
-            emptyGun = new MediaPlayer(emptyGunSound);
-            
-            Media birdSound = new Media(new File("resources/sound/bird_sound.mp3").toURI().toString());
-            bird = new MediaPlayer(birdSound);
-            
-            setOnKeyPressed(e -> reload(e));
-            setOnMousePressed(e -> onClick(e));
+        // list initialization and bullet display
+        birdList = new LinkedList<>();
+        bulletList = new LinkedList<>();
+        CreateBullets();
+        
+        // Music and sounds
+        initializeMusic();
+       
+        setFocusTraversable(true);
+        requestFocus();
+        setOnKeyPressed(e -> reload(e));
+        setOnMousePressed(e -> onClick(e));
+        
+    }
+    
+    private void initializeHighScore() {
+    	boolean write = false;
+        try (BufferedReader reader = new BufferedReader(new FileReader("data/high-score.txt"))) {
+            String high_score = reader.readLine();
+
+            if (high_score != null) {
+                if (Integer.parseInt(high_score) < SCORE) {
+                    write = true;
+                    HIGH_SCORE = SCORE;
+                } else {
+                	HIGH_SCORE = Integer.parseInt(high_score);
+                }
+            } else {
+                write = true;
+                HIGH_SCORE = SCORE;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error reading from the file: " + e.getMessage());
         }
+
+        if (write) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/high-score.txt"))) {
+                writer.write(String.valueOf(SCORE));
+            } catch (Exception e) {
+                System.err.println("Error writing to the file: " + e.getMessage());
+            }
+        }
+    }
+    
+    private void initializeMusic() {
+    	Media backgroundSound = new Media(new File("resources/sound/background_music.mp3").toURI().toString());
+        backgroundMusic = new MediaPlayer(backgroundSound);
+        backgroundMusic.setAutoPlay(true);
+        backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); 
+        
+        Media gunshotSound = new Media(new File("resources/sound/gunshot.mp3").toURI().toString());
+        gunshot = new MediaPlayer(gunshotSound);
+        
+        Media gunReloadSound = new Media(new File("resources/sound/gun_reload.mp3").toURI().toString());
+        gunReload = new MediaPlayer(gunReloadSound);
+        
+        Media emptyGunSound = new Media(new File("resources/sound/empty_gun.mp3").toURI().toString());
+        emptyGun = new MediaPlayer(emptyGunSound);
+        
+        Media birdSound = new Media(new File("resources/sound/bird_sound.mp3").toURI().toString());
+        bird = new MediaPlayer(birdSound);
+    }
+    
+    private void initializeTexts() {
+        BorderPane textContainer = new BorderPane();
+        textContainer.setPrefWidth(maxWidth);
+
+        time = new Text("TIME: " + formatTime(TIME[0])); time.getStyleClass().add("text");
+        score = new Text("SCORE: " + SCORE); score.getStyleClass().add("text");
+        pause = new Text("PAUSE"); pause.getStyleClass().add("text");
+
+        BorderPane.setMargin(score, new Insets(15, 15, 0, 15)); 
+        BorderPane.setMargin(time, new Insets(15, 0, 0, 0));
+        BorderPane.setMargin(pause, new Insets(15, 15, 0, 15)); 
+
+        textContainer.setLeft(score);
+        textContainer.setCenter(time);
+        textContainer.setRight(pause);
+
+        pause.setOnMousePressed(e -> pauseClick());
+        pause.setOnMouseEntered(e -> pause.getStyleClass().add("hovered"));
+        pause.setOnMouseExited(e -> pause.getStyleClass().remove("hovered"));
+
+        getChildren().add(textContainer);
+        
+        SpaceReload = new StackPane();
+        SpaceReload.setPrefWidth(maxWidth);
+        Text SpaceReloadText = new Text("PRESS SPACE TO RELOAD"); SpaceReloadText.getStyleClass().add("text");
+        SpaceReload.getChildren().add(SpaceReloadText);
+        StackPane.setAlignment(SpaceReloadText, Pos.CENTER);
+        SpaceReload.setLayoutY((maxHeight/8)*7);
+    }
+
+
+    
+    private void initializeTimers() {
+    	// timer for in game play time 
+        timeline = new Timeline();
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                TIME[0]--;
+                time.setText("TIME: " + formatTime(TIME[0]));
+                // when game time runs out
+                if (TIME[0] <= 0) {
+                    timeline.stop();
+                    timer.stop();
+                    initializeHighScore();
+                    tryAgainScreen.setScore(SCORE);
+                    tryAgainScreen.setHighScore(HIGH_SCORE);
+                    root.getChildren().add(tryAgainScreen);
+                }
+            }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        
+        // timer for game updating
+        timer = new Timer(this);
     }
     
     public void startGame() {
@@ -191,7 +259,7 @@ public class Game extends Group {
     private void CreateBullets() {
     	Image img = new Image("file:resources/other/bullet.png", BULLET_SIZE, BULLET_SIZE, false, false);
     	
-    	int initialX = (int) maxWidth - BULLET_SIZE;
+    	int initialX = (int) maxWidth - BULLET_SIZE - 10;
     	
     	// display 10 bullets in a row
     	for (int i = initialX; i >= initialX - (9 * BULLET_SIZE); i-= BULLET_SIZE) {
