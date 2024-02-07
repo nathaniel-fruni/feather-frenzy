@@ -25,14 +25,14 @@ public class Main extends Application {
 			Image cursorImage = new Image("file:resources/other/aim.png");
 			scene.setCursor(new ImageCursor(cursorImage, cursorImage.getWidth() / 2, cursorImage.getHeight() / 2));
 			
-	        Game game = new Game(screenWidth, screenHeight, "file:resources/screens/background.png", root);
+	        Game game = new Game(screenWidth, screenHeight, "file:resources/screens/background.jpg", root);
 	        
-	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "file:resources/screens/start_screen.png", root, game);
+	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "file:resources/screens/background.jpg", root, game);
 	        root.getChildren().add(strS);
 	        
 	        primaryStage.setFullScreen(true);
 	        primaryStage.setScene(scene); 
-	        primaryStage.setTitle("Feather Frenzy");
+	        primaryStage.setTitle("Lumina Impact");
 	        primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

@@ -35,10 +35,10 @@ public class Game extends Group {
     private int SCORE = 0;
     private int HIGH_SCORE;
     private int BULLETS = 10; // max number of bullets
-    private int[] TIME = {60}; // time in game 
+    private int[] TIME = {45}; // time in game 
     private int BULLET_SIZE = 50;
     private double maxWidth, maxHeight; // game dimensions
-    private LinkedList<Bird> birdList; // birds on scene
+    private LinkedList<Energy> birdList; // birds on scene
     private LinkedList<ImageView> bulletList; // bullets on scene
     private ImageView background;
     // Texts
@@ -49,6 +49,8 @@ public class Game extends Group {
     // Music and sounds
     private MediaPlayer gunshot;
     private MediaPlayer backgroundMusic;
+    private MediaPlayer backgroundMusic2;
+    private MediaPlayer gameOver;
     private MediaPlayer gunReload;
     private MediaPlayer emptyGun;
     private MediaPlayer bird;
@@ -123,8 +125,14 @@ public class Game extends Group {
     private void initializeMusic() {
     	Media backgroundSound = new Media(new File("resources/sound/background_music.mp3").toURI().toString());
         backgroundMusic = new MediaPlayer(backgroundSound);
-        backgroundMusic.setAutoPlay(true);
-        backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); 
+        
+        Media backgroundSound2 = new Media(new File("resources/sound/background_music2.mp3").toURI().toString());
+        backgroundMusic2 = new MediaPlayer(backgroundSound2);
+        backgroundMusic2.setAutoPlay(true);
+        backgroundMusic2.setCycleCount(MediaPlayer.INDEFINITE);
+        
+        Media gameOverSound = new Media(new File("resources/sound/game_over.mp3").toURI().toString());
+        gameOver = new MediaPlayer(gameOverSound);
         
         Media gunshotSound = new Media(new File("resources/sound/gunshot.mp3").toURI().toString());
         gunshot = new MediaPlayer(gunshotSound);
@@ -183,6 +191,10 @@ public class Game extends Group {
                 if (TIME[0] <= 0) {
                     timeline.stop();
                     timer.stop();
+                    backgroundMusic.stop();
+                    gameOver.seek(Duration.ZERO);
+                    gameOver.play();
+                    backgroundMusic2.play();
                     initializeHighScore();
                     tryAgainScreen.setScore(SCORE);
                     tryAgainScreen.setHighScore(HIGH_SCORE);
@@ -201,12 +213,17 @@ public class Game extends Group {
     	// method that is called in StartScreen after clicking on START THE GAME button
     	timer.start();
  	    timeline.play();
+ 	    backgroundMusic2.stop();
+ 	    backgroundMusic.setAutoPlay(true);
+        backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); 
     }
     
     private void pauseClick() {
     	// method that is called after clicking on PAUSE button
     	timeline.stop();
         timer.stop();
+        backgroundMusic.pause();
+        backgroundMusic2.play();
         root.getChildren().add(pauseScreen);
     }
     
@@ -214,20 +231,24 @@ public class Game extends Group {
     	// method that is called in PauseScreen after clicking on RESUME button
     	timer.start();
     	timeline.play();
+    	backgroundMusic2.stop();
+    	backgroundMusic.play();
     }
     
     public void resetGame() {
     	// method that is called in TryAgainScreen after clicking on TRY AGAIN button
     	SCORE = 0;
-    	TIME[0] = 60;
+    	TIME[0] = 45;
    	    score.setText("SCORE: " + SCORE);
    	    time.setText("TIME: " + formatTime(TIME[0]));
   	    if (getChildren().contains(SpaceReload)) getChildren().remove(SpaceReload);
+  	    backgroundMusic2.stop();
+  	    backgroundMusic.play();
   	   
   	    // delete birds that remained on scene
-  	    Iterator<Bird> iterator = birdList.iterator();
+  	    Iterator<Energy> iterator = birdList.iterator();
   	    while (iterator.hasNext()) {
-  	    	Bird element = iterator.next();
+  	    	Energy element = iterator.next();
   	    	iterator.remove();
 		    getChildren().remove(element);
 	    }
@@ -273,11 +294,11 @@ public class Game extends Group {
     private void CreateBird() {
     	if (birdList.size() < MAXBIRD) {
     		if (Math.random() < 0.3) {
-    			double[] birdSizes = {this.maxWidth/20, this.maxWidth/15, this.maxWidth/10}; 
+    			double[] birdSizes = {this.maxWidth/30, this.maxWidth/25, this.maxWidth/20}; 
     			// generate random bird size
     	        int randomIndex = new Random().nextInt(3);
     	        double randomSize = birdSizes[randomIndex]; 
-    	        Bird b = new Bird("file:resources/birds/bird", 48,randomSize, randomSize, maxWidth, maxHeight);
+    	        Energy b = new Energy("file:resources/energy-orbs/energy", 24, randomSize, randomSize, maxWidth, maxHeight);
     	        birdList.add(b);                
     	        getChildren().add(b);          
     	    }
@@ -285,18 +306,18 @@ public class Game extends Group {
     }
     
     private void MoveBird(double delta) {
-    	Iterator<Bird> iterator = birdList.iterator();
+    	Iterator<Energy> iterator = birdList.iterator();
     	while (iterator.hasNext()) {
-    		Bird element = iterator.next();
+    		Energy element = iterator.next();
     	    element.move(delta);
     	}
     }
     
     private void DeleteBirds() {
     	// delete all birds that are off screen
-    	Iterator<Bird> iterator = birdList.iterator();
+    	Iterator<Energy> iterator = birdList.iterator();
     	while (iterator.hasNext()) {
-    		Bird element = iterator.next();
+    		Energy element = iterator.next();
     		if (element.getState() == 2) {
     			iterator.remove();
     			getChildren().remove(element); 
@@ -312,15 +333,15 @@ public class Game extends Group {
 	   // birds, if clicked on
 	   if(BULLETS > 0) { // if the gun was loaded
 		   // iterate over all birds and check if the bird was clicked on
-		   Iterator<Bird> iterator = birdList.iterator();
+		   Iterator<Energy> iterator = birdList.iterator();
 		   while (iterator.hasNext()) {
-			   Bird element = iterator.next();
+			   Energy element = iterator.next();
 			   
 			   if (element.getBoundsInParent().contains(mouseX, mouseY)) {
 				   
 				   // bird sound
 	 	   		   if(element.getState() != 1) {
-	 	   			   bird.seek(Duration.ZERO); // reset the sound to begining
+	 	   			   bird.seek(Duration.ZERO);
 		 	   		   bird.play();
 	 	   		   }
 				   
