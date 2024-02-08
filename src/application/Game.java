@@ -31,14 +31,14 @@ import javafx.util.Duration;
 
 public class Game extends Group {
 	
-    final int MAXBIRD = 10; // max number of birds on scene
+    final int MAXSPRITE = 15; // max number of sprites on scene
     private int SCORE = 0;
     private int HIGH_SCORE;
     private int BULLETS = 10; // max number of bullets
     private int[] TIME = {45}; // time in game 
     private int BULLET_SIZE = 50;
     private double maxWidth, maxHeight; // game dimensions
-    private LinkedList<Energy> birdList; // birds on scene
+    private LinkedList<Energy> spriteList; // energy orbs on scene
     private LinkedList<ImageView> bulletList; // bullets on scene
     private ImageView background;
     // Texts
@@ -53,7 +53,7 @@ public class Game extends Group {
     private MediaPlayer gameOver;
     private MediaPlayer gunReload;
     private MediaPlayer emptyGun;
-    private MediaPlayer bird;
+    private MediaPlayer energySound;
     // Timers
     private Timeline timeline; // for in game time
     private AnimationTimer timer; // for game updating
@@ -72,13 +72,13 @@ public class Game extends Group {
         initializeTexts();
         
         // Pause screen a Try Again screen
-        pauseScreen = new PauseScreen(w, h, "file:resources/screens/pause_screen.png", root, this);
-        tryAgainScreen = new TryAgainScreen(w, h, "file:resources/screens/try_again_screen.png", root, this);
+        pauseScreen = new PauseScreen(w, h, "file:resources/screens/pause_screen.jpg", root, this);
+        tryAgainScreen = new TryAgainScreen(w, h, "file:resources/screens/try_again_screen.jpg", root, this);
         
         initializeTimers();
 
         // list initialization and bullet display
-        birdList = new LinkedList<>();
+        spriteList = new LinkedList<>();
         bulletList = new LinkedList<>();
         CreateBullets();
         
@@ -133,6 +133,10 @@ public class Game extends Group {
         
         Media gameOverSound = new Media(new File("resources/sound/game_over.mp3").toURI().toString());
         gameOver = new MediaPlayer(gameOverSound);
+        gameOver.setVolume(1.0);
+        gameOver.setOnEndOfMedia(() -> {
+            backgroundMusic2.play();
+        });
         
         Media gunshotSound = new Media(new File("resources/sound/gunshot.mp3").toURI().toString());
         gunshot = new MediaPlayer(gunshotSound);
@@ -143,8 +147,8 @@ public class Game extends Group {
         Media emptyGunSound = new Media(new File("resources/sound/empty_gun.mp3").toURI().toString());
         emptyGun = new MediaPlayer(emptyGunSound);
         
-        Media birdSound = new Media(new File("resources/sound/bird_sound.mp3").toURI().toString());
-        bird = new MediaPlayer(birdSound);
+        Media spriteSound = new Media(new File("resources/sound/energy_sound.mp3").toURI().toString());
+        energySound = new MediaPlayer(spriteSound);
     }
     
     private void initializeTexts() {
@@ -191,13 +195,15 @@ public class Game extends Group {
                 if (TIME[0] <= 0) {
                     timeline.stop();
                     timer.stop();
+                    
                     backgroundMusic.stop();
                     gameOver.seek(Duration.ZERO);
                     gameOver.play();
-                    backgroundMusic2.play();
+                    
                     initializeHighScore();
                     tryAgainScreen.setScore(SCORE);
                     tryAgainScreen.setHighScore(HIGH_SCORE);
+                    
                     root.getChildren().add(tryAgainScreen);
                 }
             }
@@ -214,8 +220,7 @@ public class Game extends Group {
     	timer.start();
  	    timeline.play();
  	    backgroundMusic2.stop();
- 	    backgroundMusic.setAutoPlay(true);
-        backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); 
+ 	    backgroundMusic.play(); 
     }
     
     private void pauseClick() {
@@ -245,8 +250,8 @@ public class Game extends Group {
   	    backgroundMusic2.stop();
   	    backgroundMusic.play();
   	   
-  	    // delete birds that remained on scene
-  	    Iterator<Energy> iterator = birdList.iterator();
+  	    // delete energy orbs that remained on scene
+  	    Iterator<Energy> iterator = spriteList.iterator();
   	    while (iterator.hasNext()) {
   	    	Energy element = iterator.next();
   	    	iterator.remove();
@@ -268,9 +273,9 @@ public class Game extends Group {
      }
     
     public void updateGame(double deltaTime) {
-    	CreateBird();
-        MoveBird(deltaTime/1000000000);
-        DeleteBirds(); // delete off screen birds
+    	CreateEnergy();
+        MoveEnergy(deltaTime/1000000000);
+        DeleteEnergies(); // delete off screen energy orbs
         // space reload info text
         if (BULLETS == 0 && (!getChildren().contains(SpaceReload))) {
         	getChildren().add(SpaceReload);
@@ -291,31 +296,31 @@ public class Game extends Group {
     	}
     }
     
-    private void CreateBird() {
-    	if (birdList.size() < MAXBIRD) {
+    private void CreateEnergy() {
+    	if (spriteList.size() < MAXSPRITE) {
     		if (Math.random() < 0.3) {
-    			double[] birdSizes = {this.maxWidth/30, this.maxWidth/25, this.maxWidth/20}; 
-    			// generate random bird size
+    			double[] energySizes = {this.maxWidth/30, this.maxWidth/25, this.maxWidth/20}; 
+    			// generate random energy orb size
     	        int randomIndex = new Random().nextInt(3);
-    	        double randomSize = birdSizes[randomIndex]; 
+    	        double randomSize = energySizes[randomIndex]; 
     	        Energy b = new Energy("file:resources/energy-orbs/energy", 24, randomSize, randomSize, maxWidth, maxHeight);
-    	        birdList.add(b);                
+    	        spriteList.add(b);                
     	        getChildren().add(b);          
     	    }
     	}
     }
     
-    private void MoveBird(double delta) {
-    	Iterator<Energy> iterator = birdList.iterator();
+    private void MoveEnergy(double delta) {
+    	Iterator<Energy> iterator = spriteList.iterator();
     	while (iterator.hasNext()) {
     		Energy element = iterator.next();
     	    element.move(delta);
     	}
     }
     
-    private void DeleteBirds() {
+    private void DeleteEnergies() {
     	// delete all birds that are off screen
-    	Iterator<Energy> iterator = birdList.iterator();
+    	Iterator<Energy> iterator = spriteList.iterator();
     	while (iterator.hasNext()) {
     		Energy element = iterator.next();
     		if (element.getState() == 2) {
@@ -330,32 +335,32 @@ public class Game extends Group {
 	   double mouseX = evt.getX();
 	   double mouseY = evt.getY();
 	   
-	   // birds, if clicked on
+	   // energy orbs, if clicked on
 	   if(BULLETS > 0) { // if the gun was loaded
-		   // iterate over all birds and check if the bird was clicked on
-		   Iterator<Energy> iterator = birdList.iterator();
+		   // iterate over all energy orbs and check if the energy orb was clicked on
+		   Iterator<Energy> iterator = spriteList.iterator();
 		   while (iterator.hasNext()) {
 			   Energy element = iterator.next();
 			   
 			   if (element.getBoundsInParent().contains(mouseX, mouseY)) {
 				   
-				   // bird sound
+				   // energy sound
 	 	   		   if(element.getState() != 1) {
-	 	   			   bird.seek(Duration.ZERO);
-		 	   		   bird.play();
+	 	   			   energySound.seek(Duration.ZERO);
+		 	   		   energySound.play();
 	 	   		   }
 				   
 				   element.setState(1); // set state to dead
 				   // points based on size
-	 	 	       if (element.getSize() == this.maxWidth/20) SCORE += 25;
-	 	   		   if (element.getSize() == this.maxWidth/15) SCORE += 15;
-	 	   		   if (element.getSize() == this.maxWidth/10) SCORE += 5;
+	 	 	       if (element.getSize() == this.maxWidth/30) SCORE += 25;
+	 	   		   if (element.getSize() == this.maxWidth/25) SCORE += 15;
+	 	   		   if (element.getSize() == this.maxWidth/20) SCORE += 5;
 	 	   		   score.setText("SCORE: " + SCORE);
 
-	 	 	       // delete dead bird after 3 seconds
+	 	 	       // delete dead energy orb after 3 seconds
 	 	   		   PauseTransition pause = new PauseTransition(Duration.seconds(3));
 	 	           pause.setOnFinished(e -> {
-	 	        	   birdList.remove(element);
+	 	        	  spriteList.remove(element);
 	 	        	   getChildren().remove(element);
 	 	           });
 	 	           pause.play();

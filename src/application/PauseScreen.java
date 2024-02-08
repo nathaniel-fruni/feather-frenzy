@@ -26,8 +26,8 @@ public class PauseScreen extends StackPane{
 	}
 	
 	private void initializeTexts() {
-		resume = new Text("RESUME"); resume.getStyleClass().add("text4");
-        exit = new Text("EXIT"); exit.getStyleClass().add("text5");
+		resume = new Text("R E S U M E"); resume.getStyleClass().add("text4");
+        exit = new Text("E X I T"); exit.getStyleClass().add("text5");
         
         setAlignment(resume, Pos.CENTER);
         setAlignment(exit, Pos.CENTER);

@@ -28,10 +28,10 @@ public class TryAgainScreen extends StackPane {
 	}
 	
 	private void initializeTexts() {
-		tryAgain = new Text("TRY AGAIN"); tryAgain.getStyleClass().add("text3");
-        exit = new Text("EXIT THE GAME"); exit.getStyleClass().add("text");
-        high_score = new Text("HIGH SCORE: "); high_score.getStyleClass().add("text");
-		end_score = new Text("YOUR SCORE: "); end_score.getStyleClass().add("text");
+		tryAgain = new Text("T R Y  A G A I N"); tryAgain.getStyleClass().add("text3");
+        exit = new Text("E X I T  T H E  G A M E"); exit.getStyleClass().add("text");
+        high_score = new Text("H I G H  S C O R E :  "); high_score.getStyleClass().add("text");
+		end_score = new Text("Y O U R  S C O R E :  "); end_score.getStyleClass().add("text");
         
         setAlignment(tryAgain, Pos.CENTER);
         setAlignment(exit, Pos.BOTTOM_RIGHT);
@@ -63,11 +63,11 @@ public class TryAgainScreen extends StackPane {
 	}
 	
 	public void setScore(int score) {
-		end_score.setText("YOUR SCORE: " + score);
+		end_score.setText("Y O U R  S C O R E :  " + score);
 	}
 	
 	public void setHighScore(int high_score) {
-		this.high_score.setText("HIGH SCORE: " + high_score);
+		this.high_score.setText("H I G H  S C O R E :  " + high_score);
 	}
 	
 }
