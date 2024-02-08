@@ -28,7 +28,7 @@ public class Main extends Application {
 			
 	        Game game = new Game(screenWidth, screenHeight, "file:resources/screens/background.jpg", root);
 	        
-	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "file:resources/screens/background.jpg", root, game);
+	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "file:resources/screens/start_screen.jpg", root, game);
 	        root.getChildren().add(strS);
 	        
 	        primaryStage.setFullScreen(true);

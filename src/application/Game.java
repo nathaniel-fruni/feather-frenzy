@@ -34,9 +34,9 @@ public class Game extends Group {
     final int MAXSPRITE = 15; // max number of sprites on scene
     private int SCORE = 0;
     private int HIGH_SCORE;
-    private int BULLETS = 10; // max number of bullets
+    private int BULLETS = 10; // number of bullets
     private int[] TIME = {45}; // time in game 
-    private int BULLET_SIZE = 50;
+    private int BULLET_SIZE = 35;
     private double maxWidth, maxHeight; // game dimensions
     private LinkedList<Energy> spriteList; // energy orbs on scene
     private LinkedList<ImageView> bulletList; // bullets on scene
@@ -247,6 +247,7 @@ public class Game extends Group {
    	    score.setText("SCORE: " + SCORE);
    	    time.setText("TIME: " + formatTime(TIME[0]));
   	    if (getChildren().contains(SpaceReload)) getChildren().remove(SpaceReload);
+  	    if (gameOver.getStatus() == MediaPlayer.Status.PLAYING) gameOver.stop();
   	    backgroundMusic2.stop();
   	    backgroundMusic.play();
   	   
@@ -283,18 +284,22 @@ public class Game extends Group {
     }
     
     private void CreateBullets() {
-    	Image img = new Image("file:resources/other/bullet.png", BULLET_SIZE, BULLET_SIZE, false, false);
-    	
-    	int initialX = (int) maxWidth - BULLET_SIZE - 10;
-    	
-    	// display 10 bullets in a row
-    	for (int i = initialX; i >= initialX - (9 * BULLET_SIZE); i-= BULLET_SIZE) {
-    		ImageView blt = new ImageView(); blt.setImage(img);
-    		blt.setLayoutX(i); blt.setLayoutY((this.maxHeight/8)*7);
-        	bulletList.add(blt);
-        	getChildren().add(blt);
-    	}
+        Image img = new Image("file:resources/other/bullet.png", BULLET_SIZE, BULLET_SIZE, false, false);
+        
+        int totalBulletsWidth = BULLETS * BULLET_SIZE + (BULLETS - 1) * 15; // 10 is the spacing between bullets
+        int initialX = (int) (maxWidth - totalBulletsWidth) / 2;
+
+        // display 10 bullets in a row
+        for (int i = initialX; i < initialX + totalBulletsWidth; i += (BULLET_SIZE + 15)) {
+            ImageView blt = new ImageView();
+            blt.setImage(img);
+            blt.setLayoutX(i);
+            blt.setLayoutY((maxHeight / 10) * 9);
+            bulletList.add(blt);
+            getChildren().add(blt);
+        }
     }
+
     
     private void CreateEnergy() {
     	if (spriteList.size() < MAXSPRITE) {
