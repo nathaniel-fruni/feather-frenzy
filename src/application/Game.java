@@ -125,6 +125,7 @@ public class Game extends Group {
     private void initializeMusic() {
     	Media backgroundSound = new Media(new File("resources/sound/background_music.mp3").toURI().toString());
         backgroundMusic = new MediaPlayer(backgroundSound);
+        backgroundMusic.setVolume(0.4);
         
         Media backgroundSound2 = new Media(new File("resources/sound/background_music2.mp3").toURI().toString());
         backgroundMusic2 = new MediaPlayer(backgroundSound2);
@@ -149,6 +150,7 @@ public class Game extends Group {
         
         Media spriteSound = new Media(new File("resources/sound/energy_sound.mp3").toURI().toString());
         energySound = new MediaPlayer(spriteSound);
+        energySound.setVolume(1.0);
     }
     
     private void initializeTexts() {
