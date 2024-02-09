@@ -19,9 +19,9 @@ public class Energy extends ImageView {
 		  // create array of images for animation
 		  sprites = new Image[numberOfSprites];
 		  for(int i = 0; i < numberOfSprites; i++) {
-			  sprites[i] = new Image(SpriteName+i+".png", w, h, false, false);
+			  sprites[i] = new Image(getClass().getResource(SpriteName+i+".png").toExternalForm(), w, h, false, false);
 		  }
-		  killed = new Image("file:resources/energy-orbs/killed.png", w, h, false, false);    
+		  killed = new Image(getClass().getResource("/images/killed.png").toExternalForm(), w, h, false, false);    
 		  
 		  do { 
 		      speed = (int)(-5 + Math.random() * 11) * 30; // random speed > 0

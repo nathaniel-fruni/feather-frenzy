@@ -7,7 +7,6 @@ import javafx.scene.Group;
 import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.text.Font;
 
 public class Main extends Application {
 	
@@ -23,12 +22,12 @@ public class Main extends Application {
 	        Scene scene = new Scene(root, screenWidth, screenHeight);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			
-			Image cursorImage = new Image("file:resources/other/aim.png");
+			Image cursorImage = new Image(getClass().getResource("/images/aim.png").toExternalForm());
 			scene.setCursor(new ImageCursor(cursorImage, cursorImage.getWidth() / 2, cursorImage.getHeight() / 2));
 			
-	        Game game = new Game(screenWidth, screenHeight, "file:resources/screens/background.jpg", root);
+	        Game game = new Game(screenWidth, screenHeight, "/images/background.jpg", root);
 	        
-	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "file:resources/screens/start_screen.jpg", root, game);
+	        StartScreen strS = new StartScreen(screenWidth, screenHeight, "/images/start_screen.jpg", root, game);
 	        root.getChildren().add(strS);
 	        
 	        primaryStage.setFullScreen(true);

@@ -2,7 +2,6 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Iterator;
@@ -64,7 +63,7 @@ public class Game extends Group {
         
     public Game(double w, double h, String bgd, Group root) {
     	maxWidth = w; maxHeight = h; this.root = root;
-        Image bg = new Image(bgd, w, h, false, false);
+        Image bg = new Image(getClass().getResource(bgd).toExternalForm(), w, h, false, false);
         background = new ImageView(bg);
         getChildren().add(background);      
         
@@ -72,8 +71,8 @@ public class Game extends Group {
         initializeTexts();
         
         // Pause screen a Try Again screen
-        pauseScreen = new PauseScreen(w, h, "file:resources/screens/pause_screen.jpg", root, this);
-        tryAgainScreen = new TryAgainScreen(w, h, "file:resources/screens/try_again_screen.jpg", root, this);
+        pauseScreen = new PauseScreen(w, h, "/images/pause_screen.jpg", root, this);
+        tryAgainScreen = new TryAgainScreen(w, h, "/images/try_again_screen.jpg", root, this);
         
         initializeTimers();
 
@@ -123,32 +122,32 @@ public class Game extends Group {
     }
     
     private void initializeMusic() {
-    	Media backgroundSound = new Media(new File("resources/sound/background_music.mp3").toURI().toString());
+    	Media backgroundSound = new Media(getClass().getResource("/sound/background_music.mp3").toExternalForm());
         backgroundMusic = new MediaPlayer(backgroundSound);
         backgroundMusic.setVolume(0.4);
         
-        Media backgroundSound2 = new Media(new File("resources/sound/background_music2.mp3").toURI().toString());
+        Media backgroundSound2 = new Media(getClass().getResource("/sound/background_music2.mp3").toExternalForm());
         backgroundMusic2 = new MediaPlayer(backgroundSound2);
         backgroundMusic2.setAutoPlay(true);
         backgroundMusic2.setCycleCount(MediaPlayer.INDEFINITE);
         
-        Media gameOverSound = new Media(new File("resources/sound/game_over.mp3").toURI().toString());
+        Media gameOverSound = new Media(getClass().getResource("/sound/game_over.mp3").toExternalForm());
         gameOver = new MediaPlayer(gameOverSound);
         gameOver.setVolume(1.0);
         gameOver.setOnEndOfMedia(() -> {
             backgroundMusic2.play();
         });
         
-        Media gunshotSound = new Media(new File("resources/sound/gunshot.mp3").toURI().toString());
+        Media gunshotSound = new Media(getClass().getResource("/sound/gunshot.mp3").toExternalForm());
         gunshot = new MediaPlayer(gunshotSound);
         
-        Media gunReloadSound = new Media(new File("resources/sound/gun_reload.mp3").toURI().toString());
+        Media gunReloadSound = new Media(getClass().getResource("/sound/gun_reload.mp3").toExternalForm());
         gunReload = new MediaPlayer(gunReloadSound);
         
-        Media emptyGunSound = new Media(new File("resources/sound/empty_gun.mp3").toURI().toString());
+        Media emptyGunSound = new Media(getClass().getResource("/sound/empty_gun.mp3").toExternalForm());
         emptyGun = new MediaPlayer(emptyGunSound);
         
-        Media spriteSound = new Media(new File("resources/sound/energy_sound.mp3").toURI().toString());
+        Media spriteSound = new Media(getClass().getResource("/sound/energy_sound.mp3").toExternalForm());
         energySound = new MediaPlayer(spriteSound);
         energySound.setVolume(1.0);
     }
@@ -286,7 +285,7 @@ public class Game extends Group {
     }
     
     private void CreateBullets() {
-        Image img = new Image("file:resources/other/bullet.png", BULLET_SIZE, BULLET_SIZE, false, false);
+        Image img = new Image(getClass().getResource("/images/bullet.png").toExternalForm(), BULLET_SIZE, BULLET_SIZE, false, false);
         
         int totalBulletsWidth = BULLETS * BULLET_SIZE + (BULLETS - 1) * 15; // 10 is the spacing between bullets
         int initialX = (int) (maxWidth - totalBulletsWidth) / 2;
@@ -310,7 +309,7 @@ public class Game extends Group {
     			// generate random energy orb size
     	        int randomIndex = new Random().nextInt(3);
     	        double randomSize = energySizes[randomIndex]; 
-    	        Energy b = new Energy("file:resources/energy-orbs/energy", 24, randomSize, randomSize, maxWidth, maxHeight);
+    	        Energy b = new Energy("/images/energy", 24, randomSize, randomSize, maxWidth, maxHeight);
     	        spriteList.add(b);                
     	        getChildren().add(b);          
     	    }

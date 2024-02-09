@@ -15,10 +15,11 @@ public class StartScreen extends StackPane{
 	private Text exit;
 	private Game game;
 	private Group root;
+	private ImageView bgd;
 
 	public StartScreen(double w, double h, String background, Group root, Game game) {
-        Image bg = new Image(background, w, h, false, false);
-        ImageView bgd = new ImageView(bg);
+		Image bg = new Image(getClass().getResource(background).toExternalForm(), w, h, false, false);
+        bgd = new ImageView(bg);
         getChildren().add(bgd);
 		this.game = game;
 		this.root = root;
