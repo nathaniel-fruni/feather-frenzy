@@ -34,7 +34,7 @@ public class Game extends Group {
     final int MAXSPRITE = 15; // max number of sprites on scene
     private int SCORE = 0;
     private int HIGH_SCORE;
-    private int BULLETS = 12; // number of bullets
+    private int BULLETS = 10; // number of bullets
     private int[] TIME = {45}; // time in game 
     private int BULLET_SIZE = 35;
     private double maxWidth, maxHeight; // game dimensions
