@@ -95,11 +95,11 @@ public class Game extends Group {
     private void initializeHighScore() {
     	boolean write = false;
     	
-    	try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("/high-score.txt");
+    	try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("high-score.txt");
     			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
     		String high_score = reader.readLine();
 
-            if (high_score != null) {
+            if (!high_score.equals("0")) {
                 if (Integer.parseInt(high_score) < SCORE) {
                     write = true;
                     HIGH_SCORE = SCORE;
@@ -115,7 +115,7 @@ public class Game extends Group {
         }
 
         if (write) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/high-score.txt"))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("high-score.txt"))) {
                 writer.write(String.valueOf(SCORE));
             } catch (Exception e) {
                 System.err.println("Error writing to the file: " + e.getMessage());
