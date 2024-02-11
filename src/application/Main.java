@@ -20,7 +20,7 @@ public class Main extends Application {
 	        double screenHeight = screen.getBounds().getHeight();
 	        
 	        Scene scene = new Scene(root, screenWidth, screenHeight);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
 			
 			Image cursorImage = new Image(getClass().getResource("/images/aim.png").toExternalForm());
 			scene.setCursor(new ImageCursor(cursorImage, cursorImage.getWidth() / 2, cursorImage.getHeight() / 2));

@@ -2,8 +2,9 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -93,8 +94,10 @@ public class Game extends Group {
     
     private void initializeHighScore() {
     	boolean write = false;
-        try (BufferedReader reader = new BufferedReader(new FileReader("data/high-score.txt"))) {
-            String high_score = reader.readLine();
+    	
+    	try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("/high-score.txt");
+    			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+    		String high_score = reader.readLine();
 
             if (high_score != null) {
                 if (Integer.parseInt(high_score) < SCORE) {
@@ -107,8 +110,7 @@ public class Game extends Group {
                 write = true;
                 HIGH_SCORE = SCORE;
             }
-
-        } catch (Exception e) {
+    	} catch (Exception e) {
             System.err.println("Error reading from the file: " + e.getMessage());
         }
 
