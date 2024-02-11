@@ -2,9 +2,11 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -93,35 +95,40 @@ public class Game extends Group {
     }
     
     private void initializeHighScore() {
-    	boolean write = false;
-    	
-    	try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("high-score.txt");
-    			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-    		String high_score = reader.readLine();
+        boolean write = false;
 
-            if (!high_score.equals("0")) {
-                if (Integer.parseInt(high_score) < SCORE) {
-                    write = true;
-                    HIGH_SCORE = SCORE;
-                } else {
-                	HIGH_SCORE = Integer.parseInt(high_score);
-                }
-            } else {
+        String executablePath = System.getProperty("user.dir"); // gets the current working directory
+        
+        File directory = new File(executablePath + File.separator + "data");
+        directory.mkdirs();
+
+        String filePath = executablePath + File.separator + "data" + File.separator + "high-score.txt";
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String high_score = reader.readLine();
+            
+            if (Integer.parseInt(high_score) < SCORE) {
                 write = true;
                 HIGH_SCORE = SCORE;
+            } else {
+                HIGH_SCORE = Integer.parseInt(high_score);
             }
-    	} catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            write = true;
+            HIGH_SCORE = SCORE;
+        } catch (IOException e) {
             System.err.println("Error reading from the file: " + e.getMessage());
         }
 
         if (write) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("high-score.txt"))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
                 writer.write(String.valueOf(SCORE));
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.err.println("Error writing to the file: " + e.getMessage());
             }
         }
     }
+
     
     private void initializeMusic() {
     	Media backgroundSound = new Media(getClass().getResource("/sound/background_music.mp3").toExternalForm());
