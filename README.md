@@ -22,7 +22,6 @@ This README provides details about the project's structure and features:
 
 - `src/`: Contains the source code for the project.
 - `resources/`: Static assets.
-- `data/`: Text file for saving high score.
 
 ### Key Features
 
