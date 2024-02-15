@@ -30,7 +30,7 @@ This README provides details about the project's structure and features:
 - **Pause and Resume:** Pause the game at any time and seamlessly resume your adventure.
 - **Results and Options:** View your game results, compare your high score, choose to retry, or exit the game.
 
-## Music and Image credits
+## Music, sound and Image credits
 
 The music and images used in this project are sourced from Freepik and Pixabay. 
 
